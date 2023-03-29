@@ -1,22 +1,35 @@
+class Node:
+    def __init__(self, data=None, down=None):
+        self.data = data
+        self.down = down
+
 class Stack:
     def __init__(self):
-        self.model = []
+        self.top = None
+        self.count = 0
 
     def is_empty(self):
-        return self.model == []
+        return self.top == None
 
     def push(self, data):
-        self.model.append(data)
+        new_node = Node(data)
+        if not self.is_empty() :
+            new_node.down = self.top            
+        self.top = new_node
+        self.count += 1
 
     def pop(self):
         if self.is_empty():
             raise IndexError("Stack vacío - Error pop")
-        return self.model.pop()
+        pop_node = self.top
+        self.top = pop_node.down
+        self.count -= 1
+        return pop_node.data
 
     def peek(self):
         if self.is_empty():
             raise IndexError("Stack vacío - Error peek")
-        return self.model[-1]
+        return self.top.data
 
     def size(self):
-        return len(self.model)
+        return self.count
