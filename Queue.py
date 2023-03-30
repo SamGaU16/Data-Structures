@@ -18,12 +18,14 @@ class Queue:
         if not self.is_empty:
             self.floor.down = new_node
         self.floor = new_node
+        self.count += 1
 
     def dequeue(self):
         if self.is_empty():
             raise IndexError("Queue vacío - Error dequeue")
         dequeue_node = self.ceil
         self.ceil = self.ceil.down
+        self.count -= 1
         return dequeue_node.data
 
     def peek(self):

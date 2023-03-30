@@ -1,46 +1,31 @@
 class Node:
-    def __init__(self, data=None, next=None, head=None):
+    def __init__(self, data=None, next=None, disjoint=None):
         self.data = data
         self.next = next
-        self.head = head
+        self.disjoint = disjoint
 
 class DisjointSet:
     def __init__(self, data):
         new_node = Node(data=data)
         self.head = new_node
         self.tail = new_node
-
-class AllSets:
-    def __init__(self):
-        self.sets = [DisjointSet]
-
-    def make_set(self, data):
-        new_set = DisjointSet(data)
-        self.sets.append(new_set)
+        new_node.disjoint = self
     
-    def find(self, data):
-        for i in range(len(self.sets)):
-            set = self.sets[i]
-            object = self.set_find(set.head, data)
-            if object:
-                return object  
-        return None
+    def find(self, node: Node)->Node:
+        return node.disjoint.head
+    
+    def union(self, Node1: Node, Node2: Node):
+        Head1 = self.find(Node1)
+        Head2 = self.find(Node2)
+        union_node = Head1.disjoint.tail
+        union_node.next = Head2
+        last_node = self.replace_set(self, Head1.head, Head2.head)
+        Head1.disjoint.tail = last_node
 
-    def set_find(self, node: Node, data):
-        if node.data == data:
-            return node
-        else:
-            self.set_find(node.next, data)
-
-    def union(self, set1: DisjointSet, set2: DisjointSet):
-        union_node = set1.tail
-        union_node.next = set2.head
-        last_node = self.replace_head(self, set1.head, set2.head)
-        set1.tail = last_node
-
-    def replace_head(self, new_head: Node, node: Node):
-        node.head = new_head
+    def replace_set(self, new_head: Node, node: Node):
+        node.disjoint = new_head.disjoint
         if node.next:
-            self.replace_head(new_head, node.next)
+            self.replace_set(new_head, node.next)
         else:
             return node
+        
