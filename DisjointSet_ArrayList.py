@@ -1,4 +1,4 @@
-class DisjointSet:
+class DisjointSet_A:
     def __init__(self, size):
         self.parent = [i for i in range(size)]
         self.rank = [0] * size
@@ -31,9 +31,9 @@ class DisjointSet:
             if self.find(j) == parent_i:
                 total += 1
         return total
-
+"""
 # Ej:
-ds = DisjointSet(10)
+ds = DisjointSet_A(10)
 
 ds.union(0, 1)
 ds.union(2, 3)
@@ -54,3 +54,4 @@ print("El padre de 9 es:", parent_9)
 
 # Conectividad de 0, el cual es 4
 print("Componentes conectados a 0:", ds.connected_to_G(0))
+"""

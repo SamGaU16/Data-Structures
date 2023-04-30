@@ -1,12 +1,14 @@
 class Node:
-    def __init__(self, data=None, down=None):
+    def __init__(self, data, down=None):
         self.data = data
         self.down = down
 
 class Stack:
-    def __init__(self):
+    def __init__(self, size):
         self.top = None
         self.count = 0
+        for i in range(1,size+1):
+            self.push(i)
 
     def is_empty(self):
         return self.top == None
@@ -20,7 +22,7 @@ class Stack:
 
     def pop(self):
         if self.is_empty():
-            raise IndexError("Stack vacío - Error pop")
+            return None
         pop_node = self.top
         self.top = pop_node.down
         self.count -= 1
