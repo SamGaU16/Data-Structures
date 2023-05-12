@@ -195,7 +195,10 @@ def Warehouse(parameter):
     counter = 0
     i = 0
     while i<parameter:
-        randomizer = random.randint(1, parameter-counter)
+        if counter < parameter:
+            randomizer = random.randint(1, parameter-counter)
+        else:
+            randomizer = 0
         ds = Stack(randomizer)
         counter += randomizer
         Warehouse.append(ds)
