@@ -9,6 +9,7 @@ class DisjointSet_L:
         new_node = Node(data)
         self.head = new_node
         self.tail = new_node
+        self.size = 1
         new_node.disjoint = self
     
     def union(self, set2):
@@ -19,7 +20,8 @@ class DisjointSet_L:
 
     def replace_set(self, node: Node):
         node.disjoint = self
-        if node.next:
+        self.size += 1
+        if node.next: 
             return self.replace_set(node.next)
         else:
             return node
