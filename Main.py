@@ -32,7 +32,7 @@ def showG(x,y,xlabel,ylabel,color='r-'):
     font1 = {'family':'serif','color':'green','size':15}
     plt.xlabel(xlabel, fontdict = font1)
     plt.ylabel(ylabel, fontdict = font1)
-    plt.show()
+    #plt.show()
 
 def showMultiG(x,y,y2,xlabel,c1='r-',c2='b--',l1=None,l2=None):
     fig, ax = plt.subplots()
@@ -41,7 +41,7 @@ def showMultiG(x,y,y2,xlabel,c1='r-',c2='b--',l1=None,l2=None):
     ax.legend(loc='upper right')
     font1 = {'family':'serif','color':'green','size':15}
     plt.xlabel(xlabel, fontdict = font1)
-    plt.show()
+    #plt.show()
 
 def saveData(y,folder,size=None):
     date = time.strftime('%Y-%m-%d-%H-%M-%S', time.localtime())
@@ -53,7 +53,7 @@ def saveData(y,folder,size=None):
 def saveFig(folder,size=None):
     date = time.strftime('%Y-%m-%d-%H-%M-%S', time.localtime())
     if size:
-        plt.savefig('./Data/'+folder+'/'+date+'_'+size+'.png')
+        plt.savefig('./Data/'+folder+'/'+date+'_'+str(size)+'.png')
     else:
         plt.savefig('./Data/'+folder+'/'+date+'.png')
 
