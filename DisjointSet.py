@@ -4,7 +4,7 @@ class Node:
         self.parent = None
         self.rank = 0
         self.disjoint = None
-        self.sons = 0
+        self.degree = 0
 
 class DisjointSet:
     def __init__(self, data):
@@ -28,12 +28,12 @@ class DisjointSet:
         self.link(representative_N1,representative_N2)
 
     def link(self, Node1: Node, Node2: Node):
+        Node1.degree +=1
+        Node2.degree +=1
         if Node1.rank > Node2.rank:
             Node2.parent = Node1
-            Node1.sons +=1
         else:
             Node1.parent = Node2
-            Node2.sons +=1
             if Node1.rank == Node2.rank:
                 Node2.rank += 1
 
