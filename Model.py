@@ -107,7 +107,6 @@ def ForestLLD(parameter: int, limit =1.1):
     return operation_data, norm_connectance_data, operation2_data, norm_connectance2_data
 
 def ForestLLOperation(parameter: int, limit: int, max_value: int):
-    operation_data = []
     connectance_data = []
 
     make_count = 0
@@ -136,26 +135,25 @@ def ForestLLOperation(parameter: int, limit: int, max_value: int):
         size = 0
         for disjoint in copy_sets:
             size += disjoint.size
-        operation_data.append(i)
         connectance_data.append(size/len(copy_sets))
 
     norm_connectance_data = [float(i)/max(connectance_data) for i in connectance_data]
         
-    return operation_data, norm_connectance_data
+    return norm_connectance_data
 
-def ForestLLIteration(parameter: int):
+def ForestLLIteration(parameter: int, Nseeds=10):
     relation = []
     data = []
     for i in range(10,20):
         last_points = []
-
-        for j in range(10):
-            operation_data, point_data = ForestLLOperation(parameter, 10,i+10)
-            fig, ax = plt.subplots()
-            ax.plot(operation_data, point_data, label=j)
+        fig, ax = plt.subplots()
+        
+        for j in range(Nseeds):
+            point_data = ForestLLOperation(parameter, 10,i+10)
+            ax.plot(point_data, label=j)
             last_points.append(point_data[-1])
 
-        ax.legend(loc='upper right')
+        plt.legend(loc='upper right')
         plt.show()
 
         average_size = Mean(last_points)
@@ -226,7 +224,6 @@ def ForestD(parameter, limit=1.1):
     return operation_data, norm_connectance_data, degree_data, operation2_data, norm_connectance2_data, degree2_data
 
 def ForestOperation(parameter:int, limit: int, max_value: int):
-    operation_data = []
     connectance_data = []
     degree_data = []
 
@@ -259,26 +256,25 @@ def ForestOperation(parameter:int, limit: int, max_value: int):
             size += len(disjoint.nodes)
             for node in disjoint.nodes:
                 degree += node.degree
-        operation_data.append(i)
         connectance_data.append(size/len(copy_sets))
         degree_data.append(degree/size)
         
     norm_connectance_data = [float(i)/max(connectance_data) for i in connectance_data]
 
-    return operation_data, norm_connectance_data, degree_data
+    return norm_connectance_data, degree_data
 
-def ForestIteration(parameter: int):
+def ForestIteration(parameter: int, Nseeds=10):
     relation = []
     c_data = []
     d_data = []
     for i in range(10,21):
         last_points_c = []
         last_points_d = []
+        fig, ax = plt.subplots()
 
-        for j in range(10):
-            operation_data, point_data, degree_data = ForestOperation(parameter, 10,i+10)
-            fig, ax = plt.subplots()
-            ax.plot(operation_data, point_data, label=j)
+        for j in range(Nseeds):
+            point_data, degree_data = ForestOperation(parameter, 10,i+10)
+            ax.plot(point_data, label=j)
             last_points_c.append(point_data[-1])
             last_points_d.append(degree_data[-1])
 
