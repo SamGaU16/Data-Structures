@@ -12,10 +12,10 @@ sys.setrecursionlimit(10**9)
 def printMenu():
     print("Bienvenido")
     print("1- Forest LL Directional")
-    print("2- Forest LL Iteration/Beta")
+    print("2- Forest LL Iteration")
     print("3- Forest N Unions")
-    print("4- Forest Iteration/Beta")
-    print("5- Warehouse /Alpha")
+    print("4- Forest Iteration")
+    print("5- Warehouse /Beta")
     print("0- Salir")
 
 # ===============
