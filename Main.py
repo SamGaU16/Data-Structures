@@ -5,34 +5,56 @@ import time
 
 sys.setrecursionlimit(10**9)
 
+# ==============
+# Funciones Menú
+# ==============
+
 def printMenu():
     print("Bienvenido")
-    print("1- Forest LL Phase Transition")
-    print("2- Forest LL Random")
-    print("3- Forest Phase Transition")
-    print("4- Forest Random")
-    print("5- Warehouse")
+    print("1- Forest LL Directional")
+    print("2- Forest LL Iteration/Beta")
+    print("3- Forest N Unions")
+    print("4- Forest Iteration/Beta")
+    print("5- Warehouse /Alpha")
     print("0- Salir")
 
+# ===============
+# Funciones Input
+# ===============
+
 def initialP():
-    condition = input('Número de elementos iniciales: ')
+    condition = input('Número de nodos iniciales: ')
     Verifier = False
     try:
         condition = int(condition)
         Verifier = True
     except ValueError:
         pass
-    if Verifier and condition<=3000:
+    if Verifier and condition<=1000:
         return condition
     else:   
-        print('Ingrese solo valor numérico. No mayor a 3000.')
+        print('Ingrese solo valor numérico. No mayor a 1000.')
+
+# =================
+# Funciones Mostrar
+# =================
+
+def showGD(x1,y1,x2,y2,labely='<size>',c1='r-', c2='g--',l1='Hacia 1',l2='Hacia infinito'):
+    fig, ax = plt.subplots()
+    ax.plot(x1, y1, c1, label=l1)
+    ax.plot(x2, y2, c2, label=l2)
+    ax.legend(loc='upper right')
+    font1 = {'family':'serif','color':'green','size':15}
+    plt.xlabel('make/join', fontdict = font1)
+    plt.ylabel(labely, fontdict = font1)
+    plt.show()
 
 def showG(x,y,xlabel,ylabel,color='r-'):
     plt.plot(x,y,color)
     font1 = {'family':'serif','color':'green','size':15}
     plt.xlabel(xlabel, fontdict = font1)
     plt.ylabel(ylabel, fontdict = font1)
-    #plt.show()
+    plt.show()
 
 def showMultiG(x,y,y2,xlabel,c1='r-',c2='b--',l1=None,l2=None):
     fig, ax = plt.subplots()
@@ -41,7 +63,11 @@ def showMultiG(x,y,y2,xlabel,c1='r-',c2='b--',l1=None,l2=None):
     ax.legend(loc='upper right')
     font1 = {'family':'serif','color':'green','size':15}
     plt.xlabel(xlabel, fontdict = font1)
-    #plt.show()
+    plt.show()
+
+# =================
+# Funciones Guardar
+# =================
 
 def saveData(y,folder,size=None):
     date = time.strftime('%Y-%m-%d-%H-%M-%S', time.localtime())
@@ -57,6 +83,9 @@ def saveFig(folder,size=None):
     else:
         plt.savefig('./Data/'+folder+'/'+date+'.png')
 
+# ==========
+# Loop Menú
+# ==========
 
 while True:
     printMenu()
@@ -64,37 +93,42 @@ while True:
     if int(inputs[0]) == 1:
         condition = initialP()
         if condition:
-            x,y = Model.ForestLLPT(condition)
-            showG(x,y,'make/join','<size>')
-            saveFig('ForestLL',size=condition)
+            x1,y1,x2,y2 = Model.ForestLLD(condition)
+            showGD(x1,y1,x2,y2)
+            #saveFig('ForestLL',size=condition)
             #saveData(y,'ForestLL',condition)
 
     elif int(inputs[0]) == 2:
-        x,y = Model.ForestLLR()
-        showG(x,y,'make/join','<size>')
-        saveFig('ForestLL')
-        #saveData(y,'ForestLL')  
+        condition = initialP()
+        if condition:
+            x,y = Model.ForestLLIteration(condition)
+            showG(x,y,'make/join','<size>')
+            #saveFig('ForestLL')
+            #saveData(y,'ForestLL') 
 
     elif int(inputs[0]) == 3:
         condition = initialP()
         if condition:
-            x,y,y2 = Model.ForestPT(condition)
-            showMultiG(x,y,y2,'make/join',l1='<size>',l2='<degree>')
-            saveFig('Forest',size=condition)
+            x1,y1,y2,x2,y3,y4 = Model.ForestD(condition)
+            showGD(x1,y1,x2,y3)
+            showGD(x1,y2,x2,y4,labely='<degree>')
+            #saveFig('Forest',size=condition)
             #saveData(y,'Forest',condition)
 
     elif int(inputs[0]) == 4:
-        x,y,y2 = Model.ForestR()
-        showMultiG(x,y,y2,'make/join',l1='<size>',l2='<degree>')
-        saveFig('Forest')
-        #saveData(y,'Forest')
+        condition = initialP()
+        if condition:
+            x,y,y2 = Model.ForestIteration(condition)
+            showMultiG(x,y,y2,'make/join',l1='<size>',l2='<degree>')
+            #saveFig('Forest')
+            #saveData(y,'Forest')
 
     elif int(inputs[0]) == 5:
         condition = initialP()
         if condition:
             x,y = Model.Warehouse(condition)
             showG(x,y,'pop/push','<height>')
-            saveFig('Warehouse',size=condition)
+            #saveFig('Warehouse',size=condition)
             #saveData(y,'Warehouse',condition)
 
     elif int(inputs[0]) == 0:
