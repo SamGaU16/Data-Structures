@@ -380,10 +380,12 @@ def WarehouseIteration(parameter: int, Nseeds=10):
                 weight = 1/abs(central_point-relation)
             else:
                 weight = 10**4
+                
             relation_data.append(relation)
             height_data.append(height_points[-1])
             weight_data.append(weight)
-            ax.plot(point_data, label=j)
+
+            ax.plot(height_points, label=j)
 
         plt.legend(loc='upper right')
         plt.show()
