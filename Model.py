@@ -171,7 +171,7 @@ def ForestLLIteration(parameter: int, Nseeds=10):
         relation_data = []
         last_points = []
         weight_data = []
-        fig, ax = plt.subplots()
+        #fig, ax = plt.subplots()
         
         for j in range(Nseeds):
             relation, point_data = ForestLLOperation(parameter, 10,i+10)
@@ -182,10 +182,10 @@ def ForestLLIteration(parameter: int, Nseeds=10):
             relation_data.append(relation)
             last_points.append(point_data[-1])
             weight_data.append(weight)
-            ax.plot(point_data, label=j)
+            #ax.plot(point_data, label=j)
 
-        plt.legend(loc='upper right')
-        plt.show()
+        #plt.legend(loc='upper right')
+        #plt.show()
 
         average_relation = WeightedValue(relation_data, weight_data)
         average_size = WeightedValue(last_points, weight_data)
@@ -320,7 +320,7 @@ def ForestIteration(parameter: int, Nseeds=10):
             ax.plot(point_data, label=j)
 
         ax.legend(loc='upper right')
-        plt.show()
+        plt.savefig('./Data/Forest/image'+str(i)+'.png')
 
         average_relation = WeightedValue(relation_data, weight_data)
         average_size = WeightedValue(last_points_c, weight_data)
@@ -391,7 +391,7 @@ def WarehouseIteration(parameter: int, Nseeds=10):
         plt.show()
 
         average_relation = WeightedValue(relation_data, weight_data)
-        average_height = WeightedValue(height_points, weight_data)
+        average_height = WeightedValue(height_data, weight_data)
 
         avg_relation_data.append(average_relation)
         avg_height_data.append(average_height)

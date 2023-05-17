@@ -122,7 +122,7 @@ while True:
     elif int(inputs[0]) == 5:
         condition = initialP()
         if condition:
-            x,y = Model.Warehouse(condition)
+            x,y = Model.WarehouseIteration(condition)
             plotG(x,y,'pop/push','<height>','Warehouse',condition)
             #saveData(y,'Warehouse',condition)
 
