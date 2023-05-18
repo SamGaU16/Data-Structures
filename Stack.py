@@ -27,11 +27,6 @@ class Stack:
         self.top = pop_node.down
         self.count -= 1
         return pop_node.data
-
-    def peek(self):
-        if self.is_empty():
-            raise IndexError("Stack vacío - Error peek")
-        return self.top.data
-
+    
     def size(self):
         return self.count
