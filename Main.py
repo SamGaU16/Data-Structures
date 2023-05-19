@@ -4,6 +4,12 @@ import matplotlib.pyplot as plt
 import time
 
 sys.setrecursionlimit(10**9)
+SizeSeeds = [10,20,50,100]
+Relations = [round(i*0.1,1) for i in range(1,20)]
+Relations.append(10)
+Relations.append(20)
+Relations.append(50)
+Relations.append(100)
 
 # ==============
 # Funciones Menú
@@ -30,10 +36,10 @@ def initialP():
         Verifier = True
     except ValueError:
         pass
-    if Verifier and 0<=condition and condition<=1000:
+    if Verifier and 0<=condition and condition<=3000:
         return condition
     else:   
-        print('Ingrese solo valor numérico. Entre 0 a 1000.')
+        print('Ingrese solo valor numérico. Entre 0 a 3000.')
 
 # =================
 # Funciones Mostrar
@@ -58,7 +64,7 @@ def plotG(x,y,xlabel,ylabel,folder,size,color='r-'):
     saveFig(folder,size)
     plt.show()
 
-def plotMultiG(x,y,y2,xlabel,folder,size,c1='r-',c2='b--',l1=None,l2=None):
+def plotMultiG(x:list,y:list,y2:list,xlabel:str,folder:str,size:int,c1='r-',c2='b--',l1=None,l2=None):
     fig, ax = plt.subplots()
     ax.plot(x, y , c1, label=l1)
     ax.plot(x, y2, c2, label=l2)
@@ -67,6 +73,22 @@ def plotMultiG(x,y,y2,xlabel,folder,size,c1='r-',c2='b--',l1=None,l2=None):
     plt.xlabel(xlabel, fontdict = font1)
     saveFig(folder,size)
     plt.show()
+
+def plotData(data: list, folder: str, labelst=SizeSeeds ):
+    j = 0.1
+    for relation_data in data:
+        fig, ax = plt.subplots()
+        for i in range(len(relation_data)):
+            ax.plot(relation_data[i], label=labelst[i])
+        ax.legend(loc='upper left')
+        font1 = {'family':'serif','color':'green','size':15}
+        plt.xlabel('N Operaciones', fontdict = font1)
+        plt.ylabel('<size>', fontdict = font1)
+        plt.title('Razón: '+str(j), fontdict = font1)
+        saveFig(folder,j)
+        j+=0.1
+        j = round(j,1)
+        plt.show()
 
 # =================
 # Funciones Guardar
@@ -100,8 +122,9 @@ while True:
     elif int(inputs[0]) == 2:
         condition = initialP()
         if condition:
-            x,y = Model.ForestLLIteration(condition)
-            plotG(x,y,'make/join','<size>','ForestLL',condition)
+            x,y,data = Model.ForestLLIteration(Relations, SizeSeeds)
+            plotG(x,y,'make/join','<size>','ForestLL','')
+            plotData(data, 'ForestLL')
             #saveData(y,'ForestLL') 
 
     elif int(inputs[0]) == 3:
@@ -115,15 +138,17 @@ while True:
     elif int(inputs[0]) == 4:
         condition = initialP()
         if condition:
-            x,y,y2 = Model.ForestIteration(condition)
-            plotMultiG(x,y,y2,'make/join','Forest',condition,l1='<size>',l2='<degree>')
+            x,y,y2,data = Model.ForestIteration(Relations, SizeSeeds)
+            plotMultiG(x,y,y2,'make/join','Forest','',l1='<size>',l2='<degree>')
+            plotData(data, 'Forest')
             #saveData(y,'Forest')
 
     elif int(inputs[0]) == 5:
         condition = initialP()
         if condition:
-            x,y = Model.WarehouseIteration(condition)
+            x,y,data = Model.WarehouseIteration(condition)
             plotG(x,y,'pop/push','<height>','Warehouse',condition)
+            plotData(data,'Warehouse')
             #saveData(y,'Warehouse',condition)
 
     elif int(inputs[0]) == 0:
