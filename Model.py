@@ -146,10 +146,8 @@ def ForestLLOperation(parameter: int, limit: int, max_value: int):
 
         nodes = Forest.nodes()
         connectance_data.append(nodes/Forest.size())
-
-    norm_connectance_data = [float(i)/max(connectance_data) for i in connectance_data]
         
-    return relation, norm_connectance_data
+    return relation, connectance_data
 
 def ForestLLIteration(Values:list ,Nseeds: list):
     avg_relation_data = []
@@ -179,7 +177,9 @@ def ForestLLIteration(Values:list ,Nseeds: list):
         avg_size_data.append(average_size)
         all_data.append(pos_data)
 
-    return avg_relation_data, avg_size_data, all_data   
+    norm_avg_size_data = [float(i)/max(avg_size_data) for i in avg_size_data]
+
+    return avg_relation_data, norm_avg_size_data, all_data   
 
 # ================
 # Funciones Forest
@@ -255,10 +255,8 @@ def ForestOperation(parameter:int, limit: int, max_value: int):
         sizeTrees, degreeLeafs = Forest.leafsInfo()
         connectance_data.append(sizeTrees/Forest.size())
         degree_data.append(degreeLeafs/sizeTrees)
-        
-    norm_connectance_data = [float(i)/max(connectance_data) for i in connectance_data]
 
-    return relation, norm_connectance_data, degree_data
+    return relation, connectance_data, degree_data
 
 def ForestIteration(Values:list ,Nseeds: list):
     avg_relation_data = []
@@ -293,7 +291,10 @@ def ForestIteration(Values:list ,Nseeds: list):
         avg_degree_data.append(average_degree)
         all_data.append(pos_data)
 
-    return avg_relation_data, avg_size_data, avg_degree_data, all_data
+    norm_avg_size_data = [float(i)/max(avg_size_data) for i in avg_size_data]
+    norm_avg_degree_data = [float(i)/max(avg_degree_data) for i in avg_degree_data]
+
+    return avg_relation_data, norm_avg_size_data, norm_avg_degree_data, all_data
 
 # ===================
 # Funciones Warehouse
@@ -359,4 +360,6 @@ def WarehouseIteration(parameter: int, Nseeds=10):
         avg_height_data.append(average_height)
         all_data.append(pos_data)
 
-    return avg_relation_data, avg_height_data, all_data
+    norm_avg_height_data = [float(i)/max(avg_height_data) for i in avg_height_data]
+
+    return avg_relation_data, norm_avg_height_data, all_data
