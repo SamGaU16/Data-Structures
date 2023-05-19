@@ -2,38 +2,42 @@ from Stack import Stack
 from DisjointSet_LinkedList import DisjointSet_L
 from DisjointSet import DisjointSet
 import random
-import copy
-
-import matplotlib.pyplot as plt
 
 Nmod = 3000 #Número de operaciones
-N = 4000
+N = 5000
 
 # ==============================
 # Funciones Semillas de Forests
 # ==============================
 
-def RandomForestG(size: int, type=DisjointSet_L):
-    forest = []
-    copy_sets = []
+def RandomForestG(size: int, type=DisjointSet):
+    Forest = type()
     Guard = True
     count = 0
+    i = 0
     while Guard:
         operation = random.randint(0, 1)
         if operation == 0:
-            ds = type('Base')
-            forest.append(ds)
-            copy_sets.append(copy.copy(ds))
+            Forest.makeSet(i)
             count += 1
 
-        elif operation==1 and 1<len(copy_sets):
-            x,y = randomXY(len(copy_sets)-1)
-            union_op(copy_sets,x,y)
+        elif operation==1:
+            x,y = randomXY(Forest.size())
+            Forest.union(x,y)
         
         if count == size:
             Guard = False
+
+        i+=1
         
-    return copy_sets
+    return Forest
+
+def SimpleForestG(size: int, type=DisjointSet):
+    Forest = type()
+    for i in range(size):
+        Forest.makeSet(i)        
+
+    return Forest
 
 def RandomWarehouseG(size: int):
     Warehouse = []
@@ -60,17 +64,15 @@ def RandomWarehouseG(size: int):
 # ===================
 
 def randomXY(range: int):
-    x = random.randint(0, range)
-    y = random.randint(0, range)
+    if range <= 1:
+        return 0,0
+    x = random.randint(1, range)
+    y = random.randint(1, range)
     if x != y:
         return x,y
     else:
         return randomXY(range)
     
-def union_op(sets: list, x: int, y: int):
-    sets[x].union(sets[y])
-    sets.pop(y)
-
 def WeightedValue(data: list, weights: list):
     upper = 0
     for i in range(len(data)):
@@ -88,41 +90,32 @@ def ForestLLD(parameter: int, limit =1.1):
     connectance2_data = []
 
     make_count = 0
-    join_count = 0
+    union_count = 0
 
-    forest = RandomForestG(parameter)
+    Forest = RandomForestG(parameter,type=DisjointSet_L)
 
     for i in range(Nmod):
-        ds = DisjointSet_L(i)
-        forest.append(ds)
+        Forest.makeSet(i)
         make_count +=1
 
-    copy_sets = copy.copy(forest)
-
     for i in range(Nmod):
-        if 1<len(copy_sets):
-            x,y = randomXY(len(copy_sets)-1)
-            union_op(copy_sets,x,y)
-            join_count +=1
-        relation = make_count/join_count
+        x,y = randomXY(Forest.size())
+        Forest.union(x,y)
+        union_count +=1
+        relation = make_count/union_count
         if round(relation,1) <= limit:
-            size = 0
-            for disjoint in copy_sets:
-                size += disjoint.size
+            nodes = Forest.nodes()
             operation_data.append(relation)
-            connectance_data.append(size/len(copy_sets))
+            connectance_data.append(nodes/Forest.size())
 
     for i in range(Nmod):
-        ds = DisjointSet_L(i)
-        copy_sets.append(ds)
+        Forest.makeSet(i)
         make_count +=1
-        relation = make_count/join_count
+        relation = make_count/union_count
         if round(relation,1) <= limit:
-            size = 0
-            for disjoint in copy_sets:
-                size += disjoint.size
+            nodes = Forest.nodes()
             operation2_data.append(relation)
-            connectance2_data.append(size/len(copy_sets))
+            connectance2_data.append(nodes/Forest.size())
 
     norm_connectance_data = [float(i)/max(connectance_data) for i in connectance_data]
     norm_connectance2_data = [float(i)/max(connectance2_data) for i in connectance2_data]
@@ -135,65 +128,58 @@ def ForestLLOperation(parameter: int, limit: int, max_value: int):
     make_count = 0
     union_count = 0
 
-    forest = RandomForestG(parameter)
-    copy_sets = copy.copy(forest)
+    Forest = SimpleForestG(parameter,type=DisjointSet_L)
 
     for i in range(N):
         operation = random.randint(1, max_value)
         if limit < operation:
-            ds = DisjointSet_L(i)
-            forest.append(ds)
-            copy_sets.append(copy.copy(ds))
+            Forest.makeSet(i)
             make_count +=1
 
-        if operation <= limit and 1<len(copy_sets):
-            x,y = randomXY(len(copy_sets)-1)
-            union_op(copy_sets,x,y)
+        if operation <= limit:
+            x,y = randomXY(Forest.size())
+            Forest.union(x,y)
             union_count +=1
         
         if i == N-1:
             relation = make_count/union_count
 
-        size = 0
-        for disjoint in copy_sets:
-            size += disjoint.size
-        connectance_data.append(size/len(copy_sets))
+        nodes = Forest.nodes()
+        connectance_data.append(nodes/Forest.size())
 
     norm_connectance_data = [float(i)/max(connectance_data) for i in connectance_data]
         
     return relation, norm_connectance_data
 
-def ForestLLIteration(parameter: int, Nseeds=10):
+def ForestLLIteration(Values:list ,Nseeds: list):
     avg_relation_data = []
     avg_size_data = []
-    for i in range(10,20):
-        central_point = round(i/10,1)
+    all_data = []
+    for value in Values:
         relation_data = []
         last_points = []
         weight_data = []
-        #fig, ax = plt.subplots()
+        pos_data = []
         
-        for j in range(Nseeds):
-            relation, point_data = ForestLLOperation(parameter, 10,i+10)
-            if central_point != relation:
-                weight = 1/abs(central_point-relation)
+        for seed in Nseeds:
+            relation, point_data = ForestLLOperation(seed, 10,round(value*10)+10)
+            if value != relation:
+                weight = 1/abs(value-relation)
             else:
                 weight = 10**4
             relation_data.append(relation)
             last_points.append(point_data[-1])
             weight_data.append(weight)
-            #ax.plot(point_data, label=j)
-
-        #plt.legend(loc='upper right')
-        #plt.show()
+            pos_data.append(point_data)
 
         average_relation = WeightedValue(relation_data, weight_data)
         average_size = WeightedValue(last_points, weight_data)
 
         avg_relation_data.append(average_relation)
         avg_size_data.append(average_size)
+        all_data.append(pos_data)
 
-    return avg_relation_data, avg_size_data   
+    return avg_relation_data, avg_size_data, all_data   
 
 # ================
 # Funciones Forest
@@ -203,53 +189,40 @@ def ForestD(parameter, limit=1.1):
     operation_data = []
     connectance_data = []
     degree_data = []
+
     operation2_data = []
     connectance2_data = []
     degree2_data = []
-    make_count = 0
-    join_count = 0
 
-    forest = RandomForestG(parameter, type=DisjointSet)
+    make_count = 0
+    union_count = 0
+
+    Forest = RandomForestG(parameter)
 
     for i in range(Nmod):
-        ds = DisjointSet(i)
-        forest.append(ds)
+        Forest.makeSet(i)
         make_count += 1
 
-    copy_sets = copy.copy(forest)
-
     for i in range(Nmod):
-        if 1<len(copy_sets):
-            x,y = randomXY(len(copy_sets)-1)
-            union_op(copy_sets,x,y)
-            join_count +=1
-        relation = make_count/join_count
+        x,y = randomXY(Forest.size())
+        Forest.union(x,y)
+        union_count +=1
+        relation = make_count/union_count
         if round(relation,1) <= limit:
-            size = 0
-            degree  = 0
-            for disjoint in copy_sets:
-                size += len(disjoint.nodes)
-                for node in disjoint.nodes:
-                    degree += node.degree
+            sizeTrees, degreeLeafs = Forest.leafsInfo()
             operation_data.append(relation)
-            connectance_data.append(size/len(copy_sets))
-            degree_data.append(degree/size)
+            connectance_data.append(sizeTrees/Forest.size())
+            degree_data.append(degreeLeafs/sizeTrees)
 
     for i in range(Nmod):
-        ds = DisjointSet(i)
-        copy_sets.append(ds)
-        make_count +=1
-        relation = make_count/join_count
+        Forest.makeSet(i)
+        make_count += 1
+        relation = make_count/union_count
         if round(relation,1) <= limit:
-            size = 0
-            degree  = 0
-            for disjoint in copy_sets:
-                size += len(disjoint.nodes)
-                for node in disjoint.nodes:
-                    degree += node.degree
+            sizeTrees, degreeLeafs = Forest.leafsInfo()
             operation2_data.append(relation)
-            connectance2_data.append(size/len(copy_sets))
-            degree2_data.append(degree/size)
+            connectance2_data.append(sizeTrees/Forest.size())
+            degree2_data.append(degreeLeafs/sizeTrees)
 
     norm_connectance_data = [float(i)/max(connectance_data) for i in connectance_data]
     norm_connectance2_data = [float(i)/max(connectance2_data) for i in connectance2_data]
@@ -263,64 +236,53 @@ def ForestOperation(parameter:int, limit: int, max_value: int):
     make_count = 0
     union_count = 0
 
-    forest = RandomForestG(parameter, type=DisjointSet)
-    copy_sets = copy.copy(forest)
+    Forest = SimpleForestG(parameter)
 
     for i in range(N):
         operation = random.randint(1, max_value)
         if limit < operation :
-            ds = DisjointSet(i)
-            forest.append(ds)
-            copy_sets.append(copy.copy(ds))
+            Forest.makeSet(i)
             make_count +=1
 
-        if operation <= limit and 1<len(copy_sets):
-            x,y = randomXY(len(copy_sets)-1)
-            union_op(copy_sets,x,y)
+        if operation <= limit:
+            x,y = randomXY(Forest.size())
+            Forest.union(x,y)
             union_count +=1
         
         if i == N-1:
             relation = make_count/union_count
         
-        size = 0
-        degree = 0
-        for disjoint in copy_sets:
-            size += len(disjoint.nodes)
-            for node in disjoint.nodes:
-                degree += node.degree
-        connectance_data.append(size/len(copy_sets))
-        degree_data.append(degree/size)
+        sizeTrees, degreeLeafs = Forest.leafsInfo()
+        connectance_data.append(sizeTrees/Forest.size())
+        degree_data.append(degreeLeafs/sizeTrees)
         
     norm_connectance_data = [float(i)/max(connectance_data) for i in connectance_data]
 
     return relation, norm_connectance_data, degree_data
 
-def ForestIteration(parameter: int, Nseeds=10):
+def ForestIteration(Values:list ,Nseeds: list):
     avg_relation_data = []
     avg_size_data = []
     avg_degree_data = []
-    for i in range(10,21):
-        central_point = round(i/10,1)
+    all_data = []
+    for value in Values:
         relation_data = []
         last_points_c = []
         last_points_d = []
         weight_data = []
-        fig, ax = plt.subplots()
+        pos_data = []
 
-        for j in range(Nseeds):
-            relation, point_data, degree_data = ForestOperation(parameter, 10,i+10)
-            if central_point != relation:
-                weight = 1/abs(central_point-relation)
+        for seed in Nseeds:
+            relation, point_data, degree_data = ForestOperation(seed, 10,round(value*10)+10)
+            if value != relation:
+                weight = 1/abs(value-relation)
             else:
                 weight = 10**4
             relation_data.append(relation)
             last_points_c.append(point_data[-1])
             last_points_d.append(degree_data[-1])
             weight_data.append(weight)
-            ax.plot(point_data, label=j)
-
-        ax.legend(loc='upper right')
-        plt.savefig('./Data/Forest/image'+str(i)+'.png')
+            pos_data.append(point_data)
 
         average_relation = WeightedValue(relation_data, weight_data)
         average_size = WeightedValue(last_points_c, weight_data)
@@ -329,8 +291,9 @@ def ForestIteration(parameter: int, Nseeds=10):
         avg_relation_data.append(average_relation)
         avg_size_data.append(average_size)
         avg_degree_data.append(average_degree)
+        all_data.append(pos_data)
 
-    return avg_relation_data, avg_size_data, avg_degree_data
+    return avg_relation_data, avg_size_data, avg_degree_data, all_data
 
 # ===================
 # Funciones Warehouse
@@ -367,12 +330,14 @@ def WarehouseOperation(parameter: int, limit: int, max_value: int):
 def WarehouseIteration(parameter: int, Nseeds=10):
     avg_relation_data = []
     avg_height_data = []
+    all_data = []
+
     for i in range(1,21):
         central_point = round(i/10,1)
         relation_data = []
         height_data = []
         weight_data = []
-        fig, ax = plt.subplots()
+        pos_data = []
         
         for j in range(Nseeds):
             relation, height_points = ForestLLOperation(parameter, 10,i+10)
@@ -384,16 +349,14 @@ def WarehouseIteration(parameter: int, Nseeds=10):
             relation_data.append(relation)
             height_data.append(height_points[-1])
             weight_data.append(weight)
+            pos_data.append(height_points)
 
-            ax.plot(height_points, label=j)
-
-        plt.legend(loc='upper right')
-        plt.show()
 
         average_relation = WeightedValue(relation_data, weight_data)
         average_height = WeightedValue(height_data, weight_data)
-
+    
         avg_relation_data.append(average_relation)
         avg_height_data.append(average_height)
+        all_data.append(pos_data)
 
-    return avg_relation_data, avg_height_data 
+    return avg_relation_data, avg_height_data, all_data
