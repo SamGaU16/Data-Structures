@@ -83,45 +83,6 @@ def WeightedValue(data: list, weights: list):
 # Funciones ForestLL
 # ==================
 
-def ForestLLD(parameter: int, limit =1.1):
-    operation_data = []
-    connectance_data = []
-    operation2_data = []
-    connectance2_data = []
-
-    make_count = 0
-    union_count = 0
-
-    Forest = RandomForestG(parameter,type=DisjointSet_L)
-
-    for i in range(Nmod):
-        Forest.makeSet(i)
-        make_count +=1
-
-    for i in range(Nmod):
-        x,y = randomXY(Forest.size())
-        Forest.union(x,y)
-        union_count +=1
-        relation = make_count/union_count
-        if round(relation,1) <= limit:
-            nodes = Forest.nodes()
-            operation_data.append(relation)
-            connectance_data.append(nodes/Forest.size())
-
-    for i in range(Nmod):
-        Forest.makeSet(i)
-        make_count +=1
-        relation = make_count/union_count
-        if round(relation,1) <= limit:
-            nodes = Forest.nodes()
-            operation2_data.append(relation)
-            connectance2_data.append(nodes/Forest.size())
-
-    norm_connectance_data = [float(i)/max(connectance_data) for i in connectance_data]
-    norm_connectance2_data = [float(i)/max(connectance2_data) for i in connectance2_data]
-        
-    return operation_data, norm_connectance_data, operation2_data, norm_connectance2_data
-
 def ForestLLOperation(parameter: int, limit: int, max_value: int):
     connectance_data = []
 
@@ -152,6 +113,8 @@ def ForestLLOperation(parameter: int, limit: int, max_value: int):
 def ForestLLIteration(Values:list ,Nseeds: list):
     avg_relation_data = []
     avg_size_data = []
+    size_all_data = []
+    relation_all_data = []
     all_data = []
     for value in Values:
         relation_data = []
@@ -175,17 +138,19 @@ def ForestLLIteration(Values:list ,Nseeds: list):
 
         avg_relation_data.append(average_relation)
         avg_size_data.append(average_size)
+        size_all_data.append(last_points)
+        relation_all_data.append(relation_data)
         all_data.append(pos_data)
 
     norm_avg_size_data = [float(i)/max(avg_size_data) for i in avg_size_data]
 
-    return avg_relation_data, norm_avg_size_data, all_data   
+    return avg_relation_data, norm_avg_size_data, size_all_data, relation_all_data, all_data
 
 # ================
 # Funciones Forest
 # ================
 
-def ForestD(parameter, limit=1.1):
+def ForestDebug(parameter, limit=1.1):
     operation_data = []
     connectance_data = []
     degree_data = []
@@ -258,10 +223,12 @@ def ForestOperation(parameter:int, limit: int, max_value: int):
 
     return relation, connectance_data, degree_data
 
-def ForestIteration(Values:list ,Nseeds: list):
+def ForestIteration(Values:list, Nseeds: list):
     avg_relation_data = []
     avg_size_data = []
     avg_degree_data = []
+    size_all_data = []
+    relation_all_data = []
     all_data = []
     for value in Values:
         relation_data = []
@@ -289,12 +256,14 @@ def ForestIteration(Values:list ,Nseeds: list):
         avg_relation_data.append(average_relation)
         avg_size_data.append(average_size)
         avg_degree_data.append(average_degree)
+        size_all_data.append(last_points_c)
+        relation_all_data.append(relation_data)
         all_data.append(pos_data)
 
     norm_avg_size_data = [float(i)/max(avg_size_data) for i in avg_size_data]
     norm_avg_degree_data = [float(i)/max(avg_degree_data) for i in avg_degree_data]
 
-    return avg_relation_data, norm_avg_size_data, norm_avg_degree_data, all_data
+    return avg_relation_data, norm_avg_size_data, norm_avg_degree_data, size_all_data, relation_all_data, all_data
 
 # ===================
 # Funciones Warehouse
@@ -328,22 +297,22 @@ def WarehouseOperation(parameter: int, limit: int, max_value: int):
 
     return relation, height_data
 
-def WarehouseIteration(parameter: int, Nseeds=10):
+def WarehouseIteration(Values:list, Nseeds: list):
     avg_relation_data = []
     avg_height_data = []
+    size_all_data = []
+    relation_all_data = []
     all_data = []
-
-    for i in range(1,21):
-        central_point = round(i/10,1)
+    for value in Values:
         relation_data = []
         height_data = []
         weight_data = []
         pos_data = []
         
-        for j in range(Nseeds):
-            relation, height_points = ForestLLOperation(parameter, 10,i+10)
-            if central_point != relation:
-                weight = 1/abs(central_point-relation)
+        for seed in Nseeds:
+            relation, height_points = ForestLLOperation(seed, 10,round(value*10)+10)
+            if value != relation:
+                weight = 1/abs(value-relation)
             else:
                 weight = 10**4
                 
@@ -352,14 +321,15 @@ def WarehouseIteration(parameter: int, Nseeds=10):
             weight_data.append(weight)
             pos_data.append(height_points)
 
-
         average_relation = WeightedValue(relation_data, weight_data)
         average_height = WeightedValue(height_data, weight_data)
     
         avg_relation_data.append(average_relation)
         avg_height_data.append(average_height)
+        size_all_data.append(height_data)
+        relation_all_data.append(relation_data)
         all_data.append(pos_data)
 
     norm_avg_height_data = [float(i)/max(avg_height_data) for i in avg_height_data]
 
-    return avg_relation_data, norm_avg_height_data, all_data
+    return avg_relation_data, norm_avg_height_data, size_all_data, relation_all_data, all_data
