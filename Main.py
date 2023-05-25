@@ -134,14 +134,14 @@ while True:
             print(MProceso)
             x,y, size_data, relation_data, data = Model.ForestLLIteration(Relations, MinorSeeds)
             path_folder = createFolder('ForestLL') 
-            plotG(x[:len(x)-4],y[:len(y)-4],'Transition',path=path_folder,xlabel='make/join',ylabel='<size>')
+            plotG(x[:-4],y[:-4],'Transition',path=path_folder,xlabel='make/join',ylabel='<size>')
             plotG(x,y,'High',path=path_folder,xlabel='make/join',ylabel='<size>')
-            plotMultiY(size_data[:len(size_data)-4],'Size Comparison', path=path_folder,
+            plotMultiY(size_data[:-4],'Size Comparison', path=path_folder,
                        xlabel= 'Initial Size',ylabel= '<size>', x_data=MinorSeeds)
-            plotMultiY(relation_data[:len(relation_data)-4],'Relation Comparison', path=path_folder,
+            plotMultiY(relation_data[:-4],'Relation Comparison', path=path_folder,
                        xlabel= 'Initial Size',ylabel= 'make/join', x_data=MinorSeeds)
             plotMultiXY(data, path=path_folder, 
-                        xlabel='N Operaciones', ylabel='<size>', labelst=Relations[:len(Relations)-4])
+                        xlabel='N Operaciones', ylabel='<size>', labelst=Relations[:-4])
             saveData(zip(x,y),path_folder)
             print(MDone)
 
@@ -149,22 +149,22 @@ while True:
             print(MProceso)
             x,y,y2, size_data, relation_data, data = Model.ForestIteration(Relations, SizeSeeds)
             path_folder = createFolder('Forest') 
-            plotDoubleG(x[:len(x)-4],y[:len(y)-4],x[:len(x)-4],y2[:len(y2)-4],'Transition',
+            plotDoubleG(x[:-4],y[:-4],x[:-4],y2[:-4],'Transition',
                         path=path_folder,xlabel='make/join',ylabel='<size>',l1='<size>',l2='<degree>')
             plotDoubleG(x,y,x,y2,'High',
                         path=path_folder,xlabel='make/join',ylabel='<size>',l1='<size>',l2='<degree>')
-            plotMultiY(size_data[:len(size_data)-4],'Size Comparison', path=path_folder,
+            plotMultiY(size_data[:-4],'Size Comparison', path=path_folder,
                        xlabel= 'Initial Size',ylabel= '<size>')
-            plotMultiY(relation_data[:len(relation_data)-4],'Relation Comparison', path=path_folder,
+            plotMultiY(relation_data[:-4],'Relation Comparison', path=path_folder,
                        xlabel= 'Initial Size',ylabel= 'make/join')
             plotMultiXY(data, path=path_folder, 
-                        xlabel='N Operaciones', ylabel='<size>', labelst=Relations[:len(Relations)-4])
+                        xlabel='N Operaciones', ylabel='<size>', labelst=Relations[:-4])
             saveData(zip(x,y,y2),path_folder)
             print(MDone)
 
     elif int(inputs[0]) == 3:
             print(MProceso)
-            x,y,size_data, relation_data, data = Model.WarehouseIteration(Relations[:len(Relations)-4], MinorSeeds)
+            x,y,size_data, relation_data, data = Model.WarehouseIteration(Relations[:-4], MinorSeeds)
             path_folder = createFolder('Warehouse') 
             plotG(x,y,'Transition',path=path_folder, xlabel='pop/push', ylabel='<height>')
             plotMultiY(size_data,'Height Comparison', path=path_folder, 
@@ -172,7 +172,7 @@ while True:
             plotMultiY(relation_data,'Relation Comparison', path=path_folder,
                        xlabel= 'Initial Height',ylabel= 'pop/push', x_data=MinorSeeds)
             plotMultiXY(data, path=path_folder, 
-                        xlabel='N Operaciones', ylabel='<height>', labelst=Relations[:len(Relations)-4])
+                        xlabel='N Operaciones', ylabel='<height>', labelst=Relations[:-4])
             saveData(zip(x,y),path_folder)
             print(MDone)
 
