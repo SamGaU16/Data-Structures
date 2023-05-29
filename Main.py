@@ -6,13 +6,9 @@ import time
 import matplotlib.pyplot as plt
 
 sys.setrecursionlimit(10**9)
-SizeSeeds = [10,20,50,100,200,500,1000]
-MinorSeeds = SizeSeeds[:4]
+SizeSeeds = [10,20,50,100,200,500,1000,2000]
+MinorSeeds = SizeSeeds[:5]
 Relations = [round(i*0.1,1) for i in range(1,21)]
-Relations.append(10)
-Relations.append(20)
-Relations.append(50)
-Relations.append(100)
 MProceso = '\n Procesando...\n'
 MDone = 'Proceso terminado con éxito.\n'
 
@@ -100,7 +96,17 @@ def plotMultiXY(data: list, path=None, xlabel = None, ylabel= None, labelst=Size
         name = 'Proporción '+str(Relations[i])
         plt.title(name, fontdict = font1)
         saveFig(path,name)
-        plt.close() 
+        plt.close()
+
+def plotFG(x,y,name, path=None, xlabel= None, ylabel=None):
+    fig, ax = plt.subplots()
+    for i in range(len(x)):
+        ax.plot(x[i],y[i],label=f'{SizeSeeds[i]}')
+    ax.legend(loc='upper left')
+    plt.xlabel(xlabel, fontdict = font1)
+    plt.ylabel(ylabel, fontdict = font1)
+    saveFig(path,name)
+    plt.close() 
 
 # ==================
 # Funciones Guardado
@@ -113,9 +119,8 @@ def createFolder(dir:str):
     os.mkdir(path)
     return path
 
-def saveData(data,path):
-    date = time.strftime('%Y-%m-%d-%H-%M-%S', time.localtime())
-    with open(path+'/'+date+'.csv', 'w') as f:
+def saveData(data,name,path):
+    with open(path+f'/{name}.csv', 'w') as f:
         writer = csv.writer(f, delimiter='\t')
         writer.writerows(data)
 
@@ -129,51 +134,40 @@ def saveFig(path,name):
 while True:
     printMenu()
     inputs = input('Seleccione una opción para continuar\n')
+    label = 'join/make'
+    label_w = 'push/pop'
 
     if int(inputs[0]) == 1:
             print(MProceso)
-            x,y, size_data, relation_data, data = Model.ForestLLIteration(Relations, MinorSeeds)
-            path_folder = createFolder('ForestLL') 
-            plotG(x[:-4],y[:-4],'Transition',path=path_folder,xlabel='make/join',ylabel='<size>')
-            plotG(x,y,'High',path=path_folder,xlabel='make/join',ylabel='<size>')
-            plotMultiY(size_data[:-4],'Size Comparison', path=path_folder,
-                       xlabel= 'Initial Size',ylabel= '<size>', x_data=MinorSeeds)
-            plotMultiY(relation_data[:-4],'Relation Comparison', path=path_folder,
-                       xlabel= 'Initial Size',ylabel= 'make/join', x_data=MinorSeeds)
-            plotMultiXY(data, path=path_folder, 
-                        xlabel='N Operaciones', ylabel='<size>', labelst=Relations[:-4])
-            saveData(zip(x,y),path_folder)
+            x,y = Model.ForestLLIteration(SizeSeeds)
+            path_folder = createFolder('ForestLL')
+            plotFG(x,y,'Transition',path=path_folder,xlabel=label,ylabel='<size>')
+            for i in range(len(x)):
+                saveData(zip(x[i],y[i]),SizeSeeds[i],path_folder)
             print(MDone)
 
     elif int(inputs[0]) == 2:
             print(MProceso)
-            x,y,y2, size_data, relation_data, data = Model.ForestIteration(Relations, SizeSeeds)
-            path_folder = createFolder('Forest') 
-            plotDoubleG(x[:-4],y[:-4],x[:-4],y2[:-4],'Transition',
-                        path=path_folder,xlabel='make/join',ylabel='<size>',l1='<size>',l2='<degree>')
-            plotDoubleG(x,y,x,y2,'High',
-                        path=path_folder,xlabel='make/join',ylabel='<size>',l1='<size>',l2='<degree>')
-            plotMultiY(size_data[:-4],'Size Comparison', path=path_folder,
-                       xlabel= 'Initial Size',ylabel= '<size>')
-            plotMultiY(relation_data[:-4],'Relation Comparison', path=path_folder,
-                       xlabel= 'Initial Size',ylabel= 'make/join')
-            plotMultiXY(data, path=path_folder, 
-                        xlabel='N Operaciones', ylabel='<size>', labelst=Relations[:-4])
-            saveData(zip(x,y,y2),path_folder)
+            x,y,y2 = Model.ForestIteration(SizeSeeds)
+            path_folder = createFolder('Forest')
+            plotFG(x,y,'Transition',path=path_folder,xlabel=label,ylabel='<size>')
+            plotFG(x,y2,'Transition Degree',path=path_folder,xlabel=label,ylabel='<size>')
+            for i in range(len(x)):
+                saveData(zip(x[i],y[i],y2[i]),SizeSeeds[i],path_folder)
             print(MDone)
 
     elif int(inputs[0]) == 3:
             print(MProceso)
-            x,y,size_data, relation_data, data = Model.WarehouseIteration(Relations[:-4], MinorSeeds)
+            x,y,size_data, relation_data, data = Model.WarehouseIteration(Relations, MinorSeeds)
             path_folder = createFolder('Warehouse') 
-            plotG(x,y,'Transition',path=path_folder, xlabel='pop/push', ylabel='<height>')
+            plotG(x,y,'Transition',path=path_folder, xlabel=label_w, ylabel='<height>')
             plotMultiY(size_data,'Height Comparison', path=path_folder, 
                        xlabel= 'Initial Height',ylabel= '<height>', x_data=MinorSeeds)
             plotMultiY(relation_data,'Relation Comparison', path=path_folder,
-                       xlabel= 'Initial Height',ylabel= 'pop/push', x_data=MinorSeeds)
+                       xlabel= 'Initial Height',ylabel= label_w, x_data=MinorSeeds)
             plotMultiXY(data, path=path_folder, 
-                        xlabel='N Operaciones', ylabel='<height>', labelst=Relations[:-4])
-            saveData(zip(x,y),path_folder)
+                        xlabel='N Operaciones', ylabel='<height>', labelst=Relations)
+            saveData(zip(x,y),'Warehouse',path_folder)
             print(MDone)
 
     elif int(inputs[0]) == 9:
@@ -183,9 +177,9 @@ while True:
             path_folder = createFolder('Debug') 
             x1,y1,y2,x2,y3,y4 = Model.ForestDebug(condition)
             plotDebug(x1,y1,x2,y3,condition,path=path_folder,
-                       xlabel='make/join',ylabel='<size>',c2='g--',l1='Hacia 1',l2='Hacia infinito')
+                       xlabel='join/make',ylabel='<size>',c2='g--',l1='Hacia 1',l2='Hacia infinito')
             plotDebug(x1,y2,x2,y4,str(condition)+'_degree',path=path_folder,
-                       xlabel='make/join',ylabel='<degree>',c2='g--',l1='Hacia 1',l2='Hacia infinito')
+                       xlabel='join/make',ylabel='<degree>',c2='g--',l1='Hacia 1',l2='Hacia infinito')
             print(MDone)
 
     elif int(inputs[0]) == 0:
