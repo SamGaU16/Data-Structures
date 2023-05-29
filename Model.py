@@ -246,11 +246,11 @@ def WarehouseOperation(parameter: int, limit: int, max_value: int):
         pos_stack = random.randint(0, len(Warehouse)-1)
         operation = random.randint(1, max_value)
         if limit < operation:
-            Warehouse[pos_stack].pop()
-            pop += 1
-        else:
             Warehouse[pos_stack].push(i)
             push += 1
+        else:
+            Warehouse[pos_stack].pop()
+            pop += 1
 
         if i == NWarehouse-1:
             relation = push/pop
@@ -275,7 +275,7 @@ def WarehouseIteration(Values:list, Nseeds: list):
         pos_data = []
         
         for seed in Nseeds:
-            relation, height_points = ForestLLOperation(seed, 10,round(value*10)+10)
+            relation, height_points = WarehouseOperation(seed, 10,round(value*10)+10)
             if value != relation:
                 weight = 1/abs(value-relation)
             else:
