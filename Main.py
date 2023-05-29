@@ -158,13 +158,13 @@ while True:
 
     elif int(inputs[0]) == 3:
             print(MProceso)
-            x,y,size_data, relation_data, data = Model.WarehouseIteration(Relations, MinorSeeds)
+            x,y,size_data, relation_data, data = Model.WarehouseIteration(Relations, SizeSeeds)
             path_folder = createFolder('Warehouse') 
             plotG(x,y,'Transition',path=path_folder, xlabel=label_w, ylabel='<height>')
             plotMultiY(size_data,'Height Comparison', path=path_folder, 
-                       xlabel= 'Initial Height',ylabel= '<height>', x_data=MinorSeeds)
+                       xlabel= 'Stacks number',ylabel= '<height>', x_data=SizeSeeds)
             plotMultiY(relation_data,'Relation Comparison', path=path_folder,
-                       xlabel= 'Initial Height',ylabel= label_w, x_data=MinorSeeds)
+                       xlabel= 'Stacks number',ylabel= label_w, x_data=SizeSeeds)
             plotMultiXY(data, path=path_folder, 
                         xlabel='N Operaciones', ylabel='<height>', labelst=Relations)
             saveData(zip(x,y),'Warehouse',path_folder)
