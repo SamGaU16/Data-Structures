@@ -17,9 +17,11 @@ class SList:
 class DisjointSet_L:
     def __init__(self):
         self.forest = LinkedList()
+        self.nodes = 0
 
     def makeSet(self,data=None):
         self.forest.appendLast(SList(data))
+        self.nodes +=1
 
     def find(self, pos: int):
         return self.forest.getNode(pos).data
@@ -45,11 +47,3 @@ class DisjointSet_L:
     
     def size(self):
         return self.forest.size
-    
-    def nodes(self):
-        nodes = 0
-        Node = self.forest.getNode(1)
-        while Node is not None:
-            nodes += Node.data.size
-            Node = Node.next
-        return nodes
