@@ -151,7 +151,7 @@ while True:
             x,y,y2 = Model.ForestIteration(SizeSeeds)
             path_folder = createFolder('Forest')
             plotFG(x,y,'Transition',path=path_folder,xlabel=label,ylabel='<size>')
-            plotFG(x,y2,'Transition Degree',path=path_folder,xlabel=label,ylabel='<size>')
+            plotFG(x,y2,'Transition Degree',path=path_folder,xlabel=label,ylabel='<degree>')
             for i in range(len(x)):
                 saveData(zip(x[i],y[i],y2[i]),SizeSeeds[i],path_folder)
             print(MDone)
