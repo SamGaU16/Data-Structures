@@ -4,7 +4,7 @@ from DisjointSet import DisjointSet
 import random
 
 Nmod = 3000 #Número de operaciones
-N = 5000
+NWarehouse = 5000
 
 # ==============================
 # Funciones Semillas de Forests
@@ -83,68 +83,48 @@ def WeightedValue(data: list, weights: list):
 # Funciones ForestLL
 # ==================
 
-def ForestLLOperation(parameter: int, limit: int, max_value: int):
+def ForestLLOperation(parameter: int, iteration=1.1):
+    union = int(iteration*parameter)
+    relation_data = []
     connectance_data = []
-
-    make_count = 0
-    union_count = 0
 
     Forest = SimpleForestG(parameter,type=DisjointSet_L)
 
-    for i in range(N):
-        operation = random.randint(1, max_value)
-        if limit < operation:
-            Forest.makeSet(i)
-            make_count +=1
+    for i in range(union):
+        x,y = randomXY(Forest.size())
+        Forest.union(x,y)
+        relation = (i+1)/parameter
 
-        if operation <= limit:
-            x,y = randomXY(Forest.size())
-            Forest.union(x,y)
-            union_count +=1
-        
-        if i == N-1:
-            relation = make_count/union_count
-
-        nodes = Forest.nodes()
+        nodes = Forest.nodes
+        relation_data.append(relation)
         connectance_data.append(nodes/Forest.size())
+    
+    norm_connectance_data = [(i-min(connectance_data))/(max(connectance_data)-min(connectance_data))
+                              for i in connectance_data]
         
-    return relation, connectance_data
+    return relation_data, norm_connectance_data
 
-def ForestLLIteration(Values:list ,Nseeds: list):
-    avg_relation_data = []
-    avg_size_data = []
-    size_all_data = []
-    relation_all_data = []
-    all_data = []
-    for value in Values:
-        relation_data = []
-        last_points = []
-        weight_data = []
-        pos_data = []
+def ForestLLIteration(Nseeds: list, N=100):
+    all_relation_data = []
+    all_size_data = []
+    for seed in Nseeds:
+        seed_size_data = []
+        avg_size_data = []
         
-        for seed in Nseeds:
-            relation, point_data = ForestLLOperation(seed, 10,round(value*10)+10)
-            if value != relation:
-                weight = 1/abs(value-relation)
-            else:
-                weight = 10**4
-            relation_data.append(relation)
-            last_points.append(point_data[-1])
-            weight_data.append(weight)
-            pos_data.append(point_data)
-
-        average_relation = WeightedValue(relation_data, weight_data)
-        average_size = WeightedValue(last_points, weight_data)
-
-        avg_relation_data.append(average_relation)
-        avg_size_data.append(average_size)
-        size_all_data.append(last_points)
-        relation_all_data.append(relation_data)
-        all_data.append(pos_data)
-
-    norm_avg_size_data = [float(i)/max(avg_size_data) for i in avg_size_data]
-
-    return avg_relation_data, norm_avg_size_data, size_all_data, relation_all_data, all_data
+        for i in range(N):
+            relation_data, size_data = ForestLLOperation(seed)
+            seed_size_data.append(size_data)
+        
+        for i in range(len(relation_data)):
+            sum_size_data = 0 
+            for j in range(N):
+                sum_size_data += seed_size_data[j][i]
+            avg_size_data.append(sum_size_data/N)
+        
+        all_relation_data.append(relation_data)
+        all_size_data.append(avg_size_data)
+    
+    return all_relation_data, all_size_data
 
 # ================
 # Funciones Forest
@@ -172,7 +152,7 @@ def ForestDebug(parameter, limit=1.1):
         x,y = randomXY(Forest.size())
         Forest.union(x,y)
         union_count +=1
-        relation = make_count/union_count
+        relation = union_count/make_count
         if round(relation,1) <= limit:
             sizeTrees, degreeLeafs = Forest.leafsInfo()
             operation_data.append(relation)
@@ -182,7 +162,7 @@ def ForestDebug(parameter, limit=1.1):
     for i in range(Nmod):
         Forest.makeSet(i)
         make_count += 1
-        relation = make_count/union_count
+        relation = union_count/make_count
         if round(relation,1) <= limit:
             sizeTrees, degreeLeafs = Forest.leafsInfo()
             operation2_data.append(relation)
@@ -194,76 +174,61 @@ def ForestDebug(parameter, limit=1.1):
         
     return operation_data, norm_connectance_data, degree_data, operation2_data, norm_connectance2_data, degree2_data
 
-def ForestOperation(parameter:int, limit: int, max_value: int):
+def ForestOperation(parameter:int, iteration=1.1):
+    union = int(iteration*parameter)
+    relation_data = []
     connectance_data = []
     degree_data = []
 
-    make_count = 0
-    union_count = 0
-
     Forest = SimpleForestG(parameter)
 
-    for i in range(N):
-        operation = random.randint(1, max_value)
-        if limit < operation :
-            Forest.makeSet(i)
-            make_count +=1
+    for i in range(union):
+        x,y = randomXY(Forest.size())
+        Forest.union(x,y)
 
-        if operation <= limit:
-            x,y = randomXY(Forest.size())
-            Forest.union(x,y)
-            union_count +=1
-        
-        if i == N-1:
-            relation = make_count/union_count
-        
+        relation = (i+1)/parameter
         sizeTrees, degreeLeafs = Forest.leafsInfo()
+
+        relation_data.append(relation)
         connectance_data.append(sizeTrees/Forest.size())
         degree_data.append(degreeLeafs/sizeTrees)
 
-    return relation, connectance_data, degree_data
+    norm_connectance_data = [(i-min(connectance_data))/(max(connectance_data)-min(connectance_data))
+                              for i in connectance_data]
+    norm_degree_data = [(i-min(degree_data))/(max(degree_data)-min(degree_data))
+                              for i in degree_data]
 
-def ForestIteration(Values:list, Nseeds: list):
-    avg_relation_data = []
-    avg_size_data = []
-    avg_degree_data = []
-    size_all_data = []
-    relation_all_data = []
-    all_data = []
-    for value in Values:
-        relation_data = []
-        last_points_c = []
-        last_points_d = []
-        weight_data = []
-        pos_data = []
+    return relation_data, norm_connectance_data, norm_degree_data
 
-        for seed in Nseeds:
-            relation, point_data, degree_data = ForestOperation(seed, 10,round(value*10)+10)
-            if value != relation:
-                weight = 1/abs(value-relation)
-            else:
-                weight = 10**4
-            relation_data.append(relation)
-            last_points_c.append(point_data[-1])
-            last_points_d.append(degree_data[-1])
-            weight_data.append(weight)
-            pos_data.append(point_data)
+def ForestIteration(Nseeds: list, N=100):
+    all_relation_data = []
+    all_size_data = []
+    all_degree_data = []
+    for seed in Nseeds:
+        seed_size_data = []
+        seed_degree_data = []
+        avg_size_data = []
+        avg_degree_data = []
+        
+        for i in range(N):
+            relation_data, size_data, degree_data = ForestOperation(seed)
+            seed_size_data.append(size_data)
+            seed_degree_data.append(degree_data)
+            
+        for i in range(len(relation_data)):
+            sum_size_data = 0
+            sum_degree_data = 0
+            for j in range(N):
+                sum_size_data += seed_size_data[j][i]
+                sum_degree_data += seed_degree_data[j][i]
+            avg_size_data.append(sum_size_data/N)
+            avg_degree_data.append(sum_degree_data/N)
+        
+        all_relation_data.append(relation_data)
+        all_size_data.append(avg_size_data)
+        all_degree_data.append(avg_degree_data)
 
-        average_relation = WeightedValue(relation_data, weight_data)
-        average_size = WeightedValue(last_points_c, weight_data)
-        average_degree = WeightedValue(last_points_d, weight_data)
-
-        avg_relation_data.append(average_relation)
-        avg_size_data.append(average_size)
-        avg_degree_data.append(average_degree)
-        size_all_data.append(last_points_c)
-        relation_all_data.append(relation_data)
-        all_data.append(pos_data)
-
-    norm_avg_size_data = [float(i)/max(avg_size_data) for i in avg_size_data]
-    norm_avg_degree_data = [float(i)/max(avg_degree_data) for i in avg_degree_data]
-
-    return avg_relation_data, norm_avg_size_data, norm_avg_degree_data, size_all_data, relation_all_data, all_data
+    return all_relation_data, all_size_data, all_degree_data
 
 # ===================
 # Funciones Warehouse
@@ -277,7 +242,7 @@ def WarehouseOperation(parameter: int, limit: int, max_value: int):
 
     Warehouse = RandomWarehouseG(parameter)
 
-    for i in range(N):
+    for i in range(NWarehouse):
         pos_stack = random.randint(0, len(Warehouse)-1)
         operation = random.randint(1, max_value)
         if limit < operation:
@@ -287,8 +252,8 @@ def WarehouseOperation(parameter: int, limit: int, max_value: int):
             Warehouse[pos_stack].push(i)
             push += 1
 
-        if i == N-1:
-            relation = pop/push
+        if i == NWarehouse-1:
+            relation = push/pop
         height = 0
         for stack in Warehouse:
             height += stack.count
