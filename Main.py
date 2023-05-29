@@ -79,7 +79,10 @@ def plotMultiY(data: list, name, path=None, xlabel = None, ylabel= None, x_data=
     fig, ax = plt.subplots()
     for i in range(len(data)):
         ax.plot(x_data, data[i], label=labelst[i])
-    ax.legend(loc='upper left')
+    fig.set_figheight(fig.get_figheight()*1.5)
+    fig.set_figwidth(fig.get_figwidth()*1.5)
+
+    ax.legend(loc='upper right')
     plt.xlabel(xlabel, fontdict = font1)
     plt.ylabel(ylabel, fontdict = font1)
     saveFig(path,name)
